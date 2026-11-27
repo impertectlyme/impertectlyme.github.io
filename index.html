@@ -22,6 +22,8 @@
   html { background: var(--bg); }
   /* plum sits behind the hero: when the page breaks into pixels, this is what shows through */
   body { background: var(--ink); color: var(--ink); font-family: var(--sans); }
+  /* nothing may make the phone page wider than the screen (that stretches the photo canvas) */
+  html, body { overflow-x: hidden; }
   .cover { position: fixed; inset: 0; background: var(--bg); z-index: 0; }
   body { -webkit-font-smoothing: antialiased; }
   ::selection { background: var(--ink); color: var(--pearl); }
@@ -178,7 +180,10 @@
     .details { grid-template-columns: 1fr; gap: 4rem; max-width: 26rem; margin-inline: auto; }
     .det:nth-child(n) { margin-top: 0; }
     section.block { padding: 6rem 0; }
-    .site-nav ul { gap: 1.2rem; }
+    /* name and links must fit on a 360 px phone without touching */
+    .site-nav { gap: .75rem; padding-left: 5vw; padding-right: 5vw; }
+    .site-nav .me { font-size: 1.35rem; }
+    .site-nav ul { gap: .9rem; font-size: .9rem; }
   }
   @media (prefers-reduced-motion: reduce) {
     .hero { height: 100vh; }
@@ -539,6 +544,7 @@ function lockCanvasSize() {
   if (w !== lockW) { lockW = w; lockH = 0; }          // rotation or a real resize: start again
   lockH = Math.max(lockH, innerHeight, Math.round(canvas.getBoundingClientRect().height));
   canvas.style.height = lockH + 'px';
+  canvas.style.width = lockW + 'px';                  // never follow a page that got wider
 }
 function build() {
   lockCanvasSize();
