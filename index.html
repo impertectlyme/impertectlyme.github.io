@@ -162,11 +162,15 @@
   .writing .c { opacity: 0; transition: opacity .2s ease; }
   .writing .c.on { opacity: 1; }
 
-  @media (max-width: 860px) {
+  /* any tall, portrait screen (phones, and phones in "desktop site" mode): photo across the
+     top at full width, name underneath */
+  @media (orientation: portrait) {
     .slot { height: auto; width: 100vw; right: 0; top: 0; }
+  }
+  @media (max-width: 860px) {
     .intro { left: 7vw; right: 7vw; bottom: calc(4vh + 3.4rem); }
     .intro h1 { font-size: clamp(3.6rem, 19vw, 6rem); }
-    .intro p { display: none; }
+    .intro p:not(.eyebrow) { display: none; }
     .scroll-hint { left: 7vw; bottom: 4vh; font-size: .95rem; }
     .about, .frame-wrap, .facts { grid-template-columns: 1fr; gap: 2.4rem; }
     .facts { gap: 0; }
@@ -303,7 +307,7 @@ import * as THREE from 'three';
 
 const PHOTO = 'assets/portrait.jpg';  // swap this file to change the photo
 const TOUCH = matchMedia('(pointer: coarse)').matches;
-const GAP = TOUCH ? 3.2 : 2.6;        // CSS px between particles (lower = sharper, heavier)
+const GAP = TOUCH ? 2.6 : 2.6;        // CSS px between particles (lower = sharper, heavier)
 const INTRO_MS = 2600;                // how long the photo takes to gather on load
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -464,7 +468,7 @@ points.renderOrder = 1;
 scene.add(points);
 
 // The photo, cover-cropped into w x h px, its chosen edges faded to transparent.
-const NARROW = matchMedia('(max-width: 860px)');
+const NARROW = matchMedia('(max-width: 860px), (orientation: portrait)');   // photo on top, fade its bottom
 function photoLayer(w, h) {
   const c = document.createElement('canvas'); c.width = w; c.height = h;
   const ctx = c.getContext('2d');
@@ -577,7 +581,7 @@ function build() {
   geo.setAttribute('aCell', new THREE.BufferAttribute(cell, 2));
   geo.setAttribute('aA', new THREE.BufferAttribute(alpha, 1));
   points.geometry.dispose(); points.geometry = geo;
-  uniforms.uSize.value = GAP * 1.15 * pr;
+  uniforms.uSize.value = GAP * 1.15 * pr * (TOUCH ? 0.72 : 1);   // smaller butterflies on phones
 }
 // the intro text is painted onto a canvas, so the web fonts must be ready first
 await Promise.all([
