@@ -46,13 +46,14 @@
   .intro p { margin-top: 1.4rem; font-size: 1.05rem; line-height: 1.6; color: var(--soft); max-width: 26ch; }
   @keyframes rise { from { opacity: 0; transform: translateY(24px); } }
 
-  .scroll-hint { position: fixed; z-index: 2; left: 50%; bottom: 4.5vh; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: .6rem; pointer-events: none;
-    font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--soft);
-    animation: rise .9s ease 2.6s both; }
-  .scroll-hint i { width: 1px; height: 42px; background: linear-gradient(var(--ink), transparent);
-    transform-origin: top; animation: drip 1.8s ease-in-out infinite; }
-  @keyframes drip { 0% { transform: scaleY(0); } 50% { transform: scaleY(1); } 100% { transform: scaleY(1); opacity: 0; } }
+  /* tells people the page scrolls (a mouse with a rolling wheel); fades out once they start */
+  .scroll-hint { position: fixed; z-index: 2; left: 8vw; bottom: 4.5vh; display: flex; align-items: center; gap: .75rem;
+    pointer-events: none; font-size: 1rem; color: var(--ink); animation: rise .9s ease 2.6s both; }
+  .scroll-hint .track { width: 22px; height: 36px; border: 2px solid currentColor; border-radius: 12px;
+    display: flex; justify-content: center; padding-top: 6px; }
+  .scroll-hint .track i { width: 3px; height: 8px; border-radius: 2px; background: currentColor;
+    animation: hint-wheel 1.6s ease-in-out infinite; }
+  @keyframes hint-wheel { 0% { transform: translateY(0); opacity: 1; } 70% { transform: translateY(12px); opacity: 0; } 100% { opacity: 0; } }
 
   .outro { position: fixed; z-index: 2; left: 6vw; right: 6vw; top: 50%; transform: translateY(-50%);
     text-align: center; opacity: 0; pointer-events: none; color: var(--pearl);
@@ -163,11 +164,10 @@
 
   @media (max-width: 860px) {
     .slot { height: auto; width: 100vw; right: 0; top: 0; }
-    .intro { left: 7vw; right: 7vw; bottom: 9vh; }
+    .intro { left: 7vw; right: 7vw; bottom: calc(4vh + 3.4rem); }
     .intro h1 { font-size: clamp(3.6rem, 19vw, 6rem); }
     .intro p { display: none; }
-    .scroll-hint { bottom: 2.5vh; }
-    .scroll-hint i { height: 28px; }
+    .scroll-hint { left: 7vw; bottom: 4vh; font-size: .95rem; }
     .about, .frame-wrap, .facts { grid-template-columns: 1fr; gap: 2.4rem; }
     .facts { gap: 0; }
     .fact { grid-template-columns: 5.5rem 1fr; }
@@ -193,7 +193,7 @@
     <h1><em>Barsha</em></h1>
     <p>A little page about me: who I am, what I love, and where to find me.</p>
   </div>
-  <div class="scroll-hint" id="scroll-hint"><span>Get to know me</span><i></i></div>
+  <div class="scroll-hint" id="scroll-hint"><span class="track" aria-hidden="true"><i></i></span>Scroll to get to know me</div>
   <div class="outro" id="outro">
     <h2>Every thread tells a story.</h2>
     <p>Here is mine.</p>
