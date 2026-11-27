@@ -526,7 +526,18 @@ function paintIntro(ctx, k) {
   ctx.restore();
 }
 
+// Lock the canvas to the tallest height this screen width has had. On phones the address bar
+// slides in and out while scrolling, which changes the viewport height; without the lock the
+// picture was stretched for a moment (looked "wide") until it was rebuilt.
+let lockW = 0, lockH = 0;
+function lockCanvasSize() {
+  const w = document.documentElement.clientWidth;
+  if (w !== lockW) { lockW = w; lockH = 0; }          // rotation or a real resize: start again
+  lockH = Math.max(lockH, innerHeight, Math.round(canvas.getBoundingClientRect().height));
+  canvas.style.height = lockH + 'px';
+}
 function build() {
+  lockCanvasSize();
   const W = canvas.clientWidth, H = canvas.clientHeight;
   renderer.setSize(W, H, false);
   camera.aspect = W / H; camera.updateProjectionMatrix();
@@ -581,6 +592,7 @@ let resizeTimer, builtW = canvas.clientWidth, builtH = canvas.clientHeight;
 addEventListener('resize', () => {
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(() => {
+    lockCanvasSize();   // address-bar moves only grow the lock, never shrink or stretch it
     if (canvas.clientWidth === builtW && canvas.clientHeight === builtH) return;
     builtW = canvas.clientWidth; builtH = canvas.clientHeight;
     build(); dirty = true;
@@ -637,7 +649,12 @@ if (!reduced) {
       if (!e.isIntersecting) e.target.dataset.side = e.boundingClientRect.top < 0 ? 'above' : 'below';
     }
   }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
-  for (const el of document.querySelectorAll('.reveal, .full')) io.observe(el);
+  for (const el of document.querySelectorAll('.reveal')) io.observe(el);
+  // the photo starts fully clipped, which the observer counts as invisible, so watch its
+  // (always visible) column instead and reveal the photo from there
+  const fullPic = document.getElementById('full');
+  if (fullPic) new IntersectionObserver(([e]) => fullPic.classList.toggle('in', e.isIntersecting),
+    { threshold: 0.15, rootMargin: '0px 0px -8% 0px' }).observe(fullPic.parentElement);
 
   // Detail crops: trace an arch outline, then develop the picture. Replays each time.
   const SVGNS = 'http://www.w3.org/2000/svg';
